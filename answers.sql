@@ -61,3 +61,40 @@ FROM OrderDetails;
 -- Display the results.
 SELECT * FROM Orders2NF;
 SELECT * FROM OrderItems2NF;
+-- Question 1: Achieving 1NF
+
+-- Assuming a temporary table ProductDetail with the given data exists.
+
+CREATE TEMPORARY TABLE ProductDetail1NF AS
+SELECT
+    OrderID,
+    CustomerName,
+    SUBSTRING_INDEX(SUBSTRING_INDEX(Products, ',', n), ',', -1) AS Product
+FROM
+    ProductDetail
+CROSS JOIN
+    (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3) AS numbers
+WHERE
+    LENGTH(SUBSTRING_INDEX(SUBSTRING_INDEX(Products, ',', n), ',', -1)) > 0;
+
+-- Display the result of 1NF transformation
+SELECT * FROM ProductDetail1NF;
+
+
+-- Question 2: Achieving 2NF
+
+-- Assuming a temporary table OrderDetails with the given data exists.
+
+-- Create a separate table for Orders (OrderID, CustomerName)
+CREATE TEMPORARY TABLE Orders2NF AS
+SELECT DISTINCT OrderID, CustomerName
+FROM OrderDetails;
+
+-- Create a separate table for OrderItems (OrderID, Product, Quantity)
+CREATE TEMPORARY TABLE OrderItems2NF AS
+SELECT OrderID, Product, Quantity
+FROM OrderDetails;
+
+-- Display the results of 2NF transformation
+SELECT * FROM Orders2NF;
+SELECT * FROM OrderItems2NF;
